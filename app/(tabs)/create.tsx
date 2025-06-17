@@ -6,7 +6,14 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 export default function Create() {
   const router = useRouter();
   const { isLoaded, user } = useUser();
@@ -46,8 +53,41 @@ export default function Create() {
     );
   }
   return (
-    <View>
-      <Text>create</Text>
-    </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
+    >
+      <View style={styles.contentContainer}>
+         {/* HEADER */}
+      <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedImage(null);
+              setCaption("");
+            }}
+            disabled={isSharing}
+          >
+            <Ionicons
+              name="close-outline"
+              size={28}
+              color={isSharing ? COLORS.grey : COLORS.white}
+            />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>New Post</Text>
+          <TouchableOpacity
+            style={[styles.shareButton, isSharing && styles.shareButtonDisabled]}
+            disabled={isSharing || !selectedImage}
+            onPress={handleShare}
+          >
+            {isSharing ? (
+              <ActivityIndicator size="small" color={COLORS.primary} />
+            ) : (
+              <Text style={styles.shareText}>Share</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
