@@ -2,15 +2,15 @@ import { COLORS } from "@/constants/theme";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { styles } from "@/styles/feed.styles";
+import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
+import { formatDistanceToNow } from "date-fns";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import CommentsModal from "./CommentsModal";
-import { formatDistanceToNow } from "date-fns";
-import { useUser } from "@clerk/clerk-expo";
 
 type PostProps = {
   post: {
@@ -33,12 +33,15 @@ type PostProps = {
 export default function Post({ post }: PostProps) {
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
-
+  const [likesCount, setLikesCount] = useState(post.likes);
   const [showComments, setShowComments] = useState(false);
 
   const { user } = useUser();
 
-  const currentUser = useQuery(api.users.getUserByClerkId, user ? { clerkId: user.id } : "skip");
+  const currentUser = useQuery(
+    api.users.getUserByClerkId,
+    user ? { clerkId: user.id } : "skip"
+  );
 
   const toggleLike = useMutation(api.posts.toggleLike);
   const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
@@ -48,6 +51,7 @@ export default function Post({ post }: PostProps) {
     try {
       const newIsLiked = await toggleLike({ postId: post._id });
       setIsLiked(newIsLiked);
+      setLikesCount((prev) => (newIsLiked ? prev + 1 : prev - 1));
     } catch (error) {
       console.error("Error toggling like:", error);
     }
@@ -72,7 +76,9 @@ export default function Post({ post }: PostProps) {
       <View style={styles.postHeader}>
         <Link
           href={
-            currentUser?._id === post.author._id ? "/(tabs)/profile" : `/user/${post.author._id}`
+            currentUser?._id === post.author._id
+              ? "/(tabs)/profile"
+              : `/user/${post.author._id}`
           }
           asChild
         >
@@ -95,7 +101,11 @@ export default function Post({ post }: PostProps) {
           </TouchableOpacity>
         ) : (
           <TouchableOpacity>
-            <Ionicons name="ellipsis-horizontal" size={20} color={COLORS.white} />
+            <Ionicons
+              name="ellipsis-horizontal"
+              size={20}
+              color={COLORS.white}
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -120,7 +130,11 @@ export default function Post({ post }: PostProps) {
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setShowComments(true)}>
-            <Ionicons name="chatbubble-outline" size={22} color={COLORS.white} />
+            <Ionicons
+              name="chatbubble-outline"
+              size={22}
+              color={COLORS.white}
+            />
           </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={handleBookmark}>
@@ -135,7 +149,7 @@ export default function Post({ post }: PostProps) {
       {/* POST INFO */}
       <View style={styles.postInfo}>
         <Text style={styles.likesText}>
-          {post.likes > 0 ? `${post.likes.toLocaleString()} likes` : "Be the first to like"}
+         {likesCount > 0 ? `${likesCount.toLocaleString()} likes` : "Be the first to like"} likes
         </Text>
         {post.caption && (
           <View style={styles.captionContainer}>
@@ -146,7 +160,9 @@ export default function Post({ post }: PostProps) {
 
         {post.comments > 0 && (
           <TouchableOpacity onPress={() => setShowComments(true)}>
-            <Text style={styles.commentsText}>View all {post.comments} comments</Text>
+            <Text style={styles.commentsText}>
+              View all {post.comments} comments
+            </Text>
           </TouchableOpacity>
         )}
 
