@@ -45,7 +45,7 @@ export const getFeedPost = query({
     //enhance post with user data and interaction status
     const postsWithInfo = await Promise.all(
       posts.map(async (post) => {
-        const postAuthor = await ctx.db.get(post.userId);
+        const postAuthor = (await ctx.db.get(post.userId))!;
         const like = await ctx.db
           .query("likes")
           .withIndex("by_user_and_post", (q) =>

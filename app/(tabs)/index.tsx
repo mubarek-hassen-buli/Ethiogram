@@ -9,6 +9,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Loader } from "@/components/Loader";
 import React, { useState } from "react";
+import Post from "@/components/Post";
 export default function Index() {
   const [refreshing, setRefreshing] = useState(false);
   const { signOut } = useAuth();
@@ -33,7 +34,9 @@ export default function Index() {
           <Ionicons name="log-out-outline" size={24} color={COLORS.white} />
         </TouchableOpacity>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false}
+      contentContainerStyle={{paddingBottom: 60}}
+      >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -43,6 +46,11 @@ export default function Index() {
             <Story key={story.id} story={story} />
           ))}
         </ScrollView>
+        {
+          posts.map((post) => (
+            <Post key={post._id} post={post} />
+          ))
+        }
       </ScrollView>
     </View>
   );
