@@ -1,15 +1,21 @@
+import { Loader } from "@/components/Loader";
+import Post from "@/components/Post";
 import Story from "@/components/Story";
 import { STORIES } from "@/constants/mock-data";
 import { COLORS } from "@/constants/theme";
+import { api } from "@/convex/_generated/api";
 import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { styles } from "../../styles/feed.styles";
 import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { Loader } from "@/components/Loader";
 import React, { useState } from "react";
-import Post from "@/components/Post";
+import {
+  FlatList,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { styles } from "../../styles/feed.styles";
 export default function Index() {
   const [refreshing, setRefreshing] = useState(false);
   const { signOut } = useAuth();
@@ -17,14 +23,14 @@ export default function Index() {
 
   if (posts === undefined) return <Loader />;
   if (posts.length === 0) return <NoPostsFound />;
-    // this does nothing
-    const onRefresh = () => {
-      setRefreshing(true);
-      setTimeout(() => {
-        setRefreshing(false);
-      }, 2000);
-    };
-  
+  // this does nothing
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  };
+
   return (
     <View style={styles.container}>
       {/* HEADER */}
@@ -34,27 +40,32 @@ export default function Index() {
           <Ionicons name="log-out-outline" size={24} color={COLORS.white} />
         </TouchableOpacity>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}
-      contentContainerStyle={{paddingBottom: 60}}
-      >
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.storiesContainer}
-        >
-          {STORIES.map((story) => (
-            <Story key={story.id} story={story} />
-          ))}
-        </ScrollView>
-        {
-          posts.map((post) => (
-            <Post key={post._id} post={post} />
-          ))
-        }
-      </ScrollView>
+      {/* POST */}
+      <FlatList
+        data={posts}
+        renderItem={({ item }) => <Post post={item} />}
+        keyExtractor={(item) => item._id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 60 }}
+        ListHeaderComponent={<StoriesSection />}
+      />
     </View>
   );
 }
+const StoriesSection = () => {
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.storiesContainer}
+    >
+      {STORIES.map((story) => (
+        <Story key={story.id} story={story} />
+      ))}
+    </ScrollView>
+  );
+};
+
 const NoPostsFound = () => (
   <View
     style={{

@@ -5,12 +5,12 @@ import { styles } from "@/styles/feed.styles";
 import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
-import { formatDistanceToNow } from "date-fns";
+// import { formatDistanceToNow } from "date-fns";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import CommentsModal from "./CommentsModal";
+ import CommentsModal from "./CommentsModal";
 
 type PostProps = {
   post: {
@@ -34,6 +34,7 @@ export default function Post({ post }: PostProps) {
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
   const [likesCount, setLikesCount] = useState(post.likes);
+  const [commentsCount, setCommentsCount] = useState(post.comments);
   const [showComments, setShowComments] = useState(false);
 
   const { user } = useUser();
@@ -44,7 +45,7 @@ export default function Post({ post }: PostProps) {
   );
 
   const toggleLike = useMutation(api.posts.toggleLike);
-  const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
+  // const toggleBookmark = useMutation(api.bookmarks.toggleBookmark);
   const deletePost = useMutation(api.posts.deletePost);
 
   const handleLike = async () => {
@@ -57,10 +58,10 @@ export default function Post({ post }: PostProps) {
     }
   };
 
-  const handleBookmark = async () => {
-    const newIsBookmarked = await toggleBookmark({ postId: post._id });
-    setIsBookmarked(newIsBookmarked);
-  };
+  // const handleBookmark = async () => {
+  //   const newIsBookmarked = await toggleBookmark({ postId: post._id });
+  //   setIsBookmarked(newIsBookmarked);
+  // };
 
   const handleDelete = async () => {
     try {
@@ -75,12 +76,11 @@ export default function Post({ post }: PostProps) {
       {/* POST HEADER */}
       <View style={styles.postHeader}>
         <Link
-          href={
-            currentUser?._id === post.author._id
-              ? "/(tabs)/profile"
-              : `/user/${post.author._id}`
-          }
-          asChild
+        href={
+          // currentUser?._id === post.author._id ? "/(tabs)/profile" : `/user/${post.author._id}`
+         "/(tabs)/profile"
+        }
+        asChild
         >
           <TouchableOpacity style={styles.postHeaderLeft}>
             <Image
@@ -137,7 +137,7 @@ export default function Post({ post }: PostProps) {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={handleBookmark}>
+        <TouchableOpacity >
           <Ionicons
             name={isBookmarked ? "bookmark" : "bookmark-outline"}
             size={22}
@@ -166,15 +166,16 @@ export default function Post({ post }: PostProps) {
           </TouchableOpacity>
         )}
 
-        <Text style={styles.timeAgo}>
+        {/* <Text style={styles.timeAgo}>
           {formatDistanceToNow(post._creationTime, { addSuffix: true })}
-        </Text>
+        </Text> */}
       </View>
 
       <CommentsModal
         postId={post._id}
         visible={showComments}
         onClose={() => setShowComments(false)}
+        onCommentAdded={() => setCommentsCount((prev) => prev + 1)}
       />
     </View>
   );
