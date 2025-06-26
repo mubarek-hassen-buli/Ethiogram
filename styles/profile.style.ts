@@ -46,8 +46,8 @@ export const styles = StyleSheet.create({
     marginRight: 32,
   },
   avatar: {
-    width: 86,
-    height: 86,
+    width: 60,
+    height: 60,
     borderRadius: 43,
     borderWidth: 2,
     borderColor: COLORS.surface,
