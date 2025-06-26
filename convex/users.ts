@@ -66,3 +66,45 @@ export const getUserByClerkId = query({
     return user;
   },
 });
+export const getUserProfile = query({
+  args: { id: v.id("users") },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.id);
+    if (!user) throw new Error("User not found");
+    return user;
+  },
+});
+export const isFollowing = query({
+  args: { followingId: v.id("users") },
+  handler: async (ctx, args) => {
+    const currentUser = await getAuthenticatedUser(ctx);
+    const follow = await ctx.db
+      .query("follows")
+      .withIndex("by_both", (q) =>
+        q.eq("followerId", currentUser._id).eq("followingId", args.followingId)
+      )
+      .first();
+    return !!follow;
+  },
+});
+export const toggleFollow = mutation({
+  args: { followingId: v.id("users") },
+  handler: async (ctx, args) => {
+    const currentUser = await getAuthenticatedUser(ctx);
+    const existing = await ctx.db
+      .query("follows")
+      .withIndex("by_both", (q) =>
+        q.eq("followerId", currentUser._id).eq("followingId", args.followingId)
+      )
+      .first();
+    if (existing) {
+      await ctx.db.delete(existing._id);
+    } else {
+      await ctx.db.insert("follows", {
+        followerId: currentUser._id,
+        followingId: args.followingId,
+      });
+    }
+    return true;
+  },
+});
