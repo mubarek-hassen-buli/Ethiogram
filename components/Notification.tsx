@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { Link } from 'expo-router'
 import { COLORS } from '@/constants/theme'
+import { formatDistanceToNow } from 'date-fns'
 export default function Notification({notification}:any) {
   return (
     <View style={styles.notificationItem}>
@@ -28,8 +29,34 @@ export default function Notification({notification}:any) {
             </View>
           </TouchableOpacity>
         </Link>
+        <View style={styles.notificationInfo}>
+          {/* todo: fix later */}
+          <Link href={`/(tabs)/notification`} asChild>
+            <TouchableOpacity>
+              <Text style={styles.username}>{notification.sender.username}</Text>
+            </TouchableOpacity>
+          </Link>
 
+          <Text style={styles.action}>
+            {notification.type === "follow"
+              ? "started following you"
+              : notification.type === "like"
+                ? "liked your post"
+                : `commented: "${notification.comment}"`}
+          </Text>
+          <Text style={styles.timeAgo}>
+            {formatDistanceToNow(notification._creationTime, { addSuffix: true })}
+          </Text>
+        </View>
    </View>
+   {notification.post && (
+        <Image
+          source={notification.post.imageUrl}
+          style={styles.postImage}
+          contentFit="cover"
+          transition={200}
+        />
+      )}
     </View>
   )
 }
