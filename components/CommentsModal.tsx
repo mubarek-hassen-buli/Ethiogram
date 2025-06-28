@@ -6,26 +6,29 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import {
-  View,
-  Text,
-  Modal,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableOpacity,
   FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Text,
   TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Loader } from "./Loader";
 import Comment from "./Comment";
+import { Loader } from "./Loader";
 
 type CommentsModal = {
   postId: Id<"posts">;
   visible: boolean;
   onClose: () => void;
-  onCommentAdded:()=> void;
 };
 
-export default function CommentsModal({ onClose, postId, visible , onCommentAdded}: CommentsModal) {
+export default function CommentsModal({
+  onClose,
+  postId,
+  visible,
+}: CommentsModal) {
   const [newComment, setNewComment] = useState("");
   const comments = useQuery(api.comments.getComments, { postId });
   const addComment = useMutation(api.comments.addComment);
@@ -40,14 +43,18 @@ export default function CommentsModal({ onClose, postId, visible , onCommentAdde
       });
 
       setNewComment("");
-      onCommentAdded();
     } catch (error) {
       console.log("Error adding comment:", error);
     }
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.modalContainer}
@@ -81,8 +88,16 @@ export default function CommentsModal({ onClose, postId, visible , onCommentAdde
             multiline
           />
 
-          <TouchableOpacity onPress={handleAddComment} disabled={!newComment.trim()}>
-            <Text style={[styles.postButton, !newComment.trim() && styles.postButtonDisabled]}>
+          <TouchableOpacity
+            onPress={handleAddComment}
+            disabled={!newComment.trim()}
+          >
+            <Text
+              style={[
+                styles.postButton,
+                !newComment.trim() && styles.postButtonDisabled,
+              ]}
+            >
               Post
             </Text>
           </TouchableOpacity>

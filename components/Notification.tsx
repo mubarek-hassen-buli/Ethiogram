@@ -1,16 +1,16 @@
-import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { styles } from '@/styles/notifications.styles'
-import { Ionicons } from '@expo/vector-icons'
-import { Image } from 'expo-image'
-import { Link } from 'expo-router'
-import { COLORS } from '@/constants/theme'
-import { formatDistanceToNow } from 'date-fns'
-export default function Notification({notification}:any) {
+import { COLORS } from "@/constants/theme";
+import { styles } from "@/styles/notifications.styles";
+import { Ionicons } from "@expo/vector-icons";
+import { formatDistanceToNow } from "date-fns";
+import { Image } from "expo-image";
+import { Link } from "expo-router";
+import React from "react";
+import { Text, TouchableOpacity, View } from "react-native";
+export default function Notification({ notification }: any) {
   return (
     <View style={styles.notificationItem}>
-   <View style={styles.notificationContent}>
-    <Link href={`/user/${notification.sender._id}`} asChild>
+      <View style={styles.notificationContent}>
+        <Link href={`/user/${notification.sender._id}`} asChild>
           <TouchableOpacity style={styles.avatarContainer}>
             <Image
               source={notification.sender.image}
@@ -30,10 +30,11 @@ export default function Notification({notification}:any) {
           </TouchableOpacity>
         </Link>
         <View style={styles.notificationInfo}>
-          {/* todo: fix later */}
-          <Link href={`/(tabs)/notification`} asChild>
+          <Link href={`/user/${notification.sender._id}`} asChild>
             <TouchableOpacity>
-              <Text style={styles.username}>{notification.sender.username}</Text>
+              <Text style={styles.username}>
+                {notification.sender.username}
+              </Text>
             </TouchableOpacity>
           </Link>
 
@@ -45,11 +46,13 @@ export default function Notification({notification}:any) {
                 : `commented: "${notification.comment}"`}
           </Text>
           <Text style={styles.timeAgo}>
-            {formatDistanceToNow(notification._creationTime, { addSuffix: true })}
+            {formatDistanceToNow(notification._creationTime, {
+              addSuffix: true,
+            })}
           </Text>
         </View>
-   </View>
-   {notification.post && (
+      </View>
+      {notification.post && (
         <Image
           source={notification.post.imageUrl}
           style={styles.postImage}
@@ -58,5 +61,5 @@ export default function Notification({notification}:any) {
         />
       )}
     </View>
-  )
+  );
 }

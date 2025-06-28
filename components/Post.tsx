@@ -5,12 +5,12 @@ import { styles } from "@/styles/feed.styles";
 import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
- import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
- import CommentsModal from "./CommentsModal";
+import CommentsModal from "./CommentsModal";
 
 type PostProps = {
   post: {
@@ -33,8 +33,6 @@ type PostProps = {
 export default function Post({ post }: PostProps) {
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
-  const [likesCount, setLikesCount] = useState(post.likes);
-  const [commentsCount, setCommentsCount] = useState(post.comments);
   const [showComments, setShowComments] = useState(false);
 
   const { user } = useUser();
@@ -52,7 +50,6 @@ export default function Post({ post }: PostProps) {
     try {
       const newIsLiked = await toggleLike({ postId: post._id });
       setIsLiked(newIsLiked);
-      setLikesCount((prev) => (newIsLiked ? prev + 1 : prev - 1));
     } catch (error) {
       console.error("Error toggling like:", error);
     }
@@ -76,10 +73,12 @@ export default function Post({ post }: PostProps) {
       {/* POST HEADER */}
       <View style={styles.postHeader}>
         <Link
-        href={
-           currentUser?._id === post.author._id ? "/(tabs)/profile" : `/user/${post.author._id}`      
-        }
-        asChild
+          href={
+            currentUser?._id === post.author._id
+              ? "/(tabs)/profile"
+              : `/user/${post.author._id}`
+          }
+          asChild
         >
           <TouchableOpacity style={styles.postHeaderLeft}>
             <Image
@@ -136,7 +135,7 @@ export default function Post({ post }: PostProps) {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={handleBookmark}> 
+        <TouchableOpacity onPress={handleBookmark}>
           <Ionicons
             name={isBookmarked ? "bookmark" : "bookmark-outline"}
             size={22}
@@ -148,7 +147,10 @@ export default function Post({ post }: PostProps) {
       {/* POST INFO */}
       <View style={styles.postInfo}>
         <Text style={styles.likesText}>
-         {likesCount > 0 ? `${likesCount.toLocaleString()} likes` : "Be the first to like"} likes
+          {post.likes > 0
+            ? `${post.likes.toLocaleString()} likes`
+            : "Be the first to like"}{" "}
+          likes
         </Text>
         {post.caption && (
           <View style={styles.captionContainer}>
@@ -160,11 +162,10 @@ export default function Post({ post }: PostProps) {
         {post.comments > 0 && (
           <TouchableOpacity onPress={() => setShowComments(true)}>
             <Text style={styles.commentsText}>
-              View all {commentsCount} comments
+              View all {post.comments} comments
             </Text>
           </TouchableOpacity>
         )}
-      
 
         <Text style={styles.timeAgo}>
           {formatDistanceToNow(post._creationTime, { addSuffix: true })}
@@ -175,7 +176,6 @@ export default function Post({ post }: PostProps) {
         postId={post._id}
         visible={showComments}
         onClose={() => setShowComments(false)}
-        onCommentAdded={() => setCommentsCount((prev) => prev + 1)}
       />
     </View>
   );
