@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "spotlight",
-    "slug": "spotlight",
+    "name": "Ethiogram",
+    "slug": "Ethiogram",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "spotlight",
+    "scheme": "Ethiogram",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
