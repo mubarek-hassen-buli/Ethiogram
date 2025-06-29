@@ -149,7 +149,7 @@ export default function Post({ post }: PostProps) {
         <Text style={styles.likesText}>
           {post.likes > 0
             ? `${post.likes.toLocaleString()} likes`
-            : "Be the first to like"}{" "}
+            : "Be the first to "}
           likes
         </Text>
         {post.caption && (

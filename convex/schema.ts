@@ -23,6 +23,16 @@ export default defineSchema({
     comments: v.number(),
   }).index("by_user", ["userId"]),
 
+  stories: defineTable({
+    userId: v.id("users"),
+    imageUrl: v.string(),
+    storageId: v.id("_storage"),
+    createdAt: v.number(),
+    isActive: v.boolean(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_active", ["userId", "isActive"]),
+
   likes: defineTable({
     userId: v.id("users"),
     postId: v.id("posts"),

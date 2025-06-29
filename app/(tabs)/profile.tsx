@@ -25,6 +25,7 @@ import {
 export default function Profile() {
   const { signOut, userId } = useAuth();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+    const [isStoriesModalVisible, setIsStoriesModalVisible] = useState(false);
   const currentUser = useQuery(api.users.getUserByClerkId, userId ? { clerkId: userId } : "skip");
 
   const [editedProfile, setEditedProfile] = useState({
@@ -33,8 +34,9 @@ export default function Profile() {
   });
 
   const [selectedPost, setSelectedPost] = useState<Doc<"posts"> | null>(null);
+    const [selectedStory, setSelectedStory] = useState<Doc<"stories"> | null>(null);
   const posts = useQuery(api.posts.getPostsByUser, {});
-
+ const stories = useQuery(api.stories.getStoryArchive, currentUser ? { userId: currentUser._id } : "skip");
   const updateProfile = useMutation(api.users.updateProfile);
 
   const handleSaveProfile = async () => {
@@ -93,6 +95,9 @@ export default function Profile() {
           <View style={styles.actionButtons}>
             <TouchableOpacity style={styles.editButton} onPress={() => setIsEditModalVisible(true)}>
               <Text style={styles.editButtonText}>Edit Profile</Text>
+            </TouchableOpacity>
+              <TouchableOpacity style={styles.storiesButton} onPress={() => setIsStoriesModalVisible(true)}>
+              <Text style={styles.storiesButtonText}>Stories</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.shareButton}>
               <Ionicons name="share-outline" size={20} color={COLORS.white} />
@@ -190,6 +195,95 @@ export default function Profile() {
                 cachePolicy={"memory-disk"}
                 style={styles.postDetailImage}
               />
+            </View>
+          )}
+        </View>
+      </Modal>
+       {/* STORIES MODAL */}
+      <Modal
+        visible={isStoriesModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setIsStoriesModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Story Archive</Text>
+              <TouchableOpacity onPress={() => setIsStoriesModalVisible(false)}>
+                <Ionicons name="close" size={24} color={COLORS.white} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.storiesScrollView}>
+              {stories && stories.length > 0 ? (
+                <FlatList
+                  data={stories}
+                  numColumns={3}
+                  scrollEnabled={false}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity 
+                      style={styles.gridItem} 
+                      onPress={() => setSelectedStory(item)}
+                    >
+                      <Image
+                        source={item.imageUrl}
+                        style={styles.gridImage}
+                        contentFit="cover"
+                        transition={200}
+                      />
+                      <View style={styles.storyOverlay}>
+                        <Text style={styles.storyDate}>
+                          {new Date(item.createdAt).toLocaleDateString()}
+                        </Text>
+                        {item.isActive && (
+                          <View style={styles.activeIndicator}>
+                            <Text style={styles.activeText}>Active</Text>
+                          </View>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                />
+              ) : (
+                <View style={styles.noStoriesContainer}>
+                  <Ionicons name="camera-outline" size={48} color={COLORS.primary} />
+                  <Text style={styles.noStoriesText}>No stories yet</Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+       {/* SELECTED STORY MODAL */}
+      <Modal
+        visible={!!selectedStory}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setSelectedStory(null)}
+      >
+        <View style={styles.modalBackdrop}>
+          {selectedStory && (
+            <View style={styles.postDetailContainer}>
+              <View style={styles.postDetailHeader}>
+                <TouchableOpacity onPress={() => setSelectedStory(null)}>
+                  <Ionicons name="close" size={24} color={COLORS.white} />
+                </TouchableOpacity>
+              </View>
+
+              <Image
+                source={selectedStory.imageUrl}
+                cachePolicy={"memory-disk"}
+                style={styles.postDetailImage}
+              />
+              <View style={styles.storyDetailFooter}>
+                <Text style={styles.storyDetailDate}>
+                  {new Date(selectedStory.createdAt).toLocaleDateString()}
+                </Text>
+                {selectedStory.isActive && (
+                  <Text style={styles.storyDetailActive}>Currently Active</Text>
+                )}
+              </View>
             </View>
           )}
         </View>

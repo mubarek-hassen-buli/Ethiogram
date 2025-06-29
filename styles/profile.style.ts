@@ -239,4 +239,76 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     color: COLORS.white,
   },
+  storiesButton: {
+    backgroundColor: COLORS.primary,
+    padding: 8,
+    borderRadius: 8,
+    alignItems: "center",
+    minWidth: 60,
+  },
+  storiesButtonText: {
+    color: COLORS.white,
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  storiesScrollView: {
+    flex: 1,
+  },
+  storyOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    padding: 4,
+  },
+  storyDate: {
+    color: COLORS.white,
+    fontSize: 10,
+    textAlign: "center",
+  },
+  activeIndicator: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    marginTop: 2,
+  },
+  activeText: {
+    color: COLORS.white,
+    fontSize: 8,
+    textAlign: "center",
+    fontWeight: "600",
+  },
+  noStoriesContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 48,
+    gap: 12,
+  },
+  noStoriesText: {
+    color: COLORS.grey,
+    fontSize: 16,
+  },
+  storyDetailFooter: {
+    padding: 16,
+    backgroundColor: COLORS.background,
+    borderTopWidth: 0.5,
+    borderTopColor: COLORS.surface,
+  },
+  storyDetailDate: {
+    color: COLORS.grey,
+    fontSize: 14,
+    textAlign: "center",
+  },
+  storyDetailActive: {
+    color: COLORS.primary,
+    fontSize: 14,
+    textAlign: "center",
+    fontWeight: "600",
+    marginTop: 4,
+  },
 });
+
+
+

@@ -75,23 +75,23 @@ export const getFeedPost = query({
   },
 });
 export const toggleLike = mutation({
-  args:{
+  args: {
     postId: v.id("posts"),
   },
-  handler:async(ctx, args)=>{
+  handler: async (ctx, args) => {
     const currentUser = await getAuthenticatedUser(ctx);
     const existing = await ctx.db
-    .query("likes")
-    .withIndex("by_user_and_post", (q) =>
-      q.eq("userId", currentUser._id).eq("postId", args.postId)
-    )
-    .first();
+      .query("likes")
+      .withIndex("by_user_and_post", (q) =>
+        q.eq("userId", currentUser._id).eq("postId", args.postId)
+      )
+      .first();
     const post = await ctx.db.get(args.postId);
-    if(!post) throw new Error("post not found");
+    if (!post) throw new Error("post not found");
     if (existing) {
       // remove like
       await ctx.db.delete(existing._id);
-      await ctx.db.patch(args.postId, { likes: post.likes - 1 });//decrement
+      await ctx.db.patch(args.postId, { likes: post.likes - 1 }); //decrement
       return false; // unliked
     } else {
       // add like
@@ -112,8 +112,8 @@ export const toggleLike = mutation({
       }
       return true; // liked
     }
-  }
-})
+  },
+});
 
 export const deletePost = mutation({
   args: { postId: v.id("posts") },
@@ -124,7 +124,8 @@ export const deletePost = mutation({
     if (!post) throw new Error("Post not found");
 
     // verify ownership
-    if (post.userId !== currentUser._id) throw new Error("Not authorized to delete this post");
+    if (post.userId !== currentUser._id)
+      throw new Error("Not authorized to delete this post");
 
     // delete associated likes
     const likes = await ctx.db
@@ -183,7 +184,9 @@ export const getPostsByUser = query({
     userId: v.optional(v.id("users")),
   },
   handler: async (ctx, args) => {
-    const user = args.userId ? await ctx.db.get(args.userId) : await getAuthenticatedUser(ctx);
+    const user = args.userId
+      ? await ctx.db.get(args.userId)
+      : await getAuthenticatedUser(ctx);
 
     if (!user) throw new Error("User not found");
 

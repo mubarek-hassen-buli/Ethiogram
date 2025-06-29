@@ -30,7 +30,7 @@ export default function CreateScreen() {
   const [caption, setCaption] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isSharing, setIsSharing] = useState(false);
-
+  const [isCreatingStory, setIsCreatingStory] = useState(false);
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: "images",
@@ -44,7 +44,8 @@ export default function CreateScreen() {
 
   const generateUploadUrl = useMutation(api.posts.generateUploadUrl);
   const createPost = useMutation(api.posts.createPost);
-
+ const generateStoryUploadUrl = useMutation(api.stories.generateUploadUrl);
+  const createStory = useMutation(api.stories.createStory);
   const handleShare = async () => {
     if (!selectedImage) return;
 
@@ -77,7 +78,38 @@ export default function CreateScreen() {
       setIsSharing(false);
     }
   };
+ const handleCreateStory = async () => {
+    if (!selectedImage) return;
 
+    try {
+      setIsCreatingStory(true);
+      const uploadUrl = await generateStoryUploadUrl();
+
+      const uploadResult = await FileSystem.uploadAsync(
+        uploadUrl,
+        selectedImage,
+        {
+          httpMethod: "POST",
+          uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
+          mimeType: "image/jpeg",
+        }
+      );
+
+      if (uploadResult.status !== 200) throw new Error("Upload failed");
+
+      const { storageId } = JSON.parse(uploadResult.body);
+      await createStory({ storageId });
+
+      setSelectedImage(null);
+      setCaption("");
+
+      router.push("/(tabs)");
+    } catch (error) {
+      console.log("Error creating story", error);
+    } finally {
+      setIsCreatingStory(false);
+    }
+  };
   if (!selectedImage) {
     return (
       <View style={styles.container}>
@@ -114,29 +146,45 @@ export default function CreateScreen() {
               setSelectedImage(null);
               setCaption("");
             }}
-            disabled={isSharing}
+            disabled={isSharing|| isCreatingStory}
           >
             <Ionicons
               name="close-outline"
               size={28}
-              color={isSharing ? COLORS.grey : COLORS.white}
+            color={isSharing || isCreatingStory ? COLORS.grey : COLORS.white}
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>New Post</Text>
-          <TouchableOpacity
-            style={[
-              styles.shareButton,
-              isSharing && styles.shareButtonDisabled,
-            ]}
-            disabled={isSharing || !selectedImage}
-            onPress={handleShare}
-          >
-            {isSharing ? (
-              <ActivityIndicator size="small" color={COLORS.primary} />
-            ) : (
-              <Text style={styles.shareText}>Share</Text>
-            )}
-          </TouchableOpacity>
+         <View style={styles.headerButtons}>
+            <TouchableOpacity
+              style={[
+                styles.storyButton,
+                (isCreatingStory || isSharing) && styles.shareButtonDisabled,
+              ]}
+              disabled={isCreatingStory || isSharing || !selectedImage}
+              onPress={handleCreateStory}
+            >
+              {isCreatingStory ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Text style={styles.storyText}>Story</Text>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.shareButton,
+                (isSharing || isCreatingStory) && styles.shareButtonDisabled,
+              ]}
+              disabled={isSharing || isCreatingStory || !selectedImage}
+              onPress={handleShare}
+            >
+              {isSharing ? (
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              ) : (
+                <Text style={styles.shareText}>Share</Text>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
 
         <ScrollView
@@ -157,7 +205,7 @@ export default function CreateScreen() {
               <TouchableOpacity
                 style={styles.changeImageButton}
                 onPress={pickImage}
-                disabled={isSharing}
+                disabled={isSharing || isCreatingStory}
               >
                 <Ionicons name="image-outline" size={20} color={COLORS.white} />
                 <Text style={styles.changeImageText}>Change</Text>

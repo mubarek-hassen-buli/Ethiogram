@@ -1,6 +1,6 @@
 // styles/create.styles.ts
-import { StyleSheet, Dimensions } from "react-native";
 import { COLORS } from "@/constants/theme";
+import { Dimensions, StyleSheet } from "react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -25,6 +25,12 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     color: COLORS.white,
+    flex: 1,
+    textAlign: "center",
+  },
+  headerButtons: {
+    flexDirection: "row",
+    gap: 8,
   },
   contentDisabled: {
     opacity: 0.7,
@@ -47,6 +53,7 @@ export const styles = StyleSheet.create({
   shareTextDisabled: {
     color: COLORS.grey,
   },
+
   emptyImageContainer: {
     flex: 1,
     justifyContent: "center",
@@ -110,5 +117,19 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     paddingTop: 8,
     minHeight: 40,
+  },
+  storyButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    minWidth: 60,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.surface,
+    borderRadius: 6,
+  },
+  storyText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
