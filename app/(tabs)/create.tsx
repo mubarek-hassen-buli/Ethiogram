@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  ActivityIndicator,//Displays a circular loading indicator.
+  ActivityIndicator, //Displays a circular loading indicator.
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -14,8 +14,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-import { Image } from "expo-image";
+import OptimizedImage from "@/components/OptimizedImage";
+// import { Image } from "expo-image";
 
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
@@ -37,6 +37,8 @@ export default function CreateScreen() {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
+    //  compress: 0.7, 
+      exif: false,
     });
 
     if (!result.canceled) setSelectedImage(result.assets[0].uri);
@@ -44,7 +46,7 @@ export default function CreateScreen() {
 
   const generateUploadUrl = useMutation(api.posts.generateUploadUrl);
   const createPost = useMutation(api.posts.createPost);
- const generateStoryUploadUrl = useMutation(api.stories.generateUploadUrl);
+  const generateStoryUploadUrl = useMutation(api.stories.generateUploadUrl);
   const createStory = useMutation(api.stories.createStory);
   const handleShare = async () => {
     if (!selectedImage) return;
@@ -78,7 +80,7 @@ export default function CreateScreen() {
       setIsSharing(false);
     }
   };
- const handleCreateStory = async () => {
+  const handleCreateStory = async () => {
     if (!selectedImage) return;
 
     try {
@@ -146,16 +148,16 @@ export default function CreateScreen() {
               setSelectedImage(null);
               setCaption("");
             }}
-            disabled={isSharing|| isCreatingStory}
+            disabled={isSharing || isCreatingStory}
           >
             <Ionicons
               name="close-outline"
               size={28}
-            color={isSharing || isCreatingStory ? COLORS.grey : COLORS.white}
+              color={isSharing || isCreatingStory ? COLORS.grey : COLORS.white}
             />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>New Post</Text>
-         <View style={styles.headerButtons}>
+          <View style={styles.headerButtons}>
             <TouchableOpacity
               style={[
                 styles.storyButton,
@@ -196,30 +198,38 @@ export default function CreateScreen() {
           <View style={[styles.content, isSharing && styles.contentDisabled]}>
             {/* IMAGE SECTION */}
             <View style={styles.imageSection}>
-              <Image
+              <OptimizedImage
                 source={selectedImage}
                 style={styles.previewImage}
                 contentFit="cover"
                 transition={200}
+                cachePolicy="memory-disk"
+                priority="high"
               />
               <TouchableOpacity
-                style={styles.changeImageButton}
+                style={[
+                  styles.changeImageButton,
+                  (isSharing || isCreatingStory) && styles.changeImageButtonDisabled
+                ]}
                 onPress={pickImage}
                 disabled={isSharing || isCreatingStory}
+                activeOpacity={0.7}
               >
                 <Ionicons name="image-outline" size={20} color={COLORS.white} />
                 <Text style={styles.changeImageText}>Change</Text>
               </TouchableOpacity>
             </View>
 
-            {/* INPUT SECTION */}
+              {/* INPUT SECTION */}
             <View style={styles.inputSection}>
               <View style={styles.captionContainer}>
-                <Image
-                  source={user?.imageUrl}
+                <OptimizedImage
+                   source={user?.imageUrl ? { uri: user.imageUrl } : ""}
                   style={styles.userAvatar}
                   contentFit="cover"
                   transition={200}
+                  cachePolicy="memory-disk"
+                  priority="high"
                 />
                 <TextInput
                   style={styles.captionInput}

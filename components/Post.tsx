@@ -6,12 +6,13 @@ import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
-import { Image } from "expo-image";
+// import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import CommentsModal from "./CommentsModal";
-
+import OptimizedImage from "./OptimizedImage";
+import PostOptionsModal from "./PostOptionsModal";
 type PostProps = {
   post: {
     _id: Id<"posts">;
@@ -34,7 +35,7 @@ export default function Post({ post }: PostProps) {
   const [isLiked, setIsLiked] = useState(post.isLiked);
   const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked);
   const [showComments, setShowComments] = useState(false);
-
+  const [showPostOptions, setShowPostOptions] = useState(false);
   const { user } = useUser();
 
   const currentUser = useQuery(
@@ -81,12 +82,13 @@ export default function Post({ post }: PostProps) {
           asChild
         >
           <TouchableOpacity style={styles.postHeaderLeft}>
-            <Image
+            <OptimizedImage
               source={post.author.image}
               style={styles.postAvatar}
               contentFit="cover"
               transition={200}
               cachePolicy="memory-disk"
+              priority="high"
             />
             <Text style={styles.postUsername}>{post.author.username}</Text>
           </TouchableOpacity>
@@ -98,7 +100,7 @@ export default function Post({ post }: PostProps) {
             <Ionicons name="trash-outline" size={20} color={COLORS.primary} />
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => setShowPostOptions(true)}>
             <Ionicons
               name="ellipsis-horizontal"
               size={20}
@@ -107,14 +109,14 @@ export default function Post({ post }: PostProps) {
           </TouchableOpacity>
         )}
       </View>
-
       {/* IMAGE */}
-      <Image
+      <OptimizedImage
         source={post.imageUrl}
         style={styles.postImage}
         contentFit="cover"
         transition={200}
         cachePolicy="memory-disk"
+        priority="normal"
       />
 
       {/* POST ACTIONS */}
@@ -176,6 +178,14 @@ export default function Post({ post }: PostProps) {
         postId={post._id}
         visible={showComments}
         onClose={() => setShowComments(false)}
+      />
+      <PostOptionsModal
+        visible={showPostOptions}
+        onClose={() => setShowPostOptions(false)}
+        postId={post._id}
+        imageUrl={post.imageUrl}
+        caption={post.caption}
+        authorUsername={post.author.username}
       />
     </View>
   );

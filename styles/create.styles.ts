@@ -67,6 +67,9 @@ export const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+   changeImageButtonDisabled: {
+    opacity: 0.5,
+  },
   scrollContent: {
     flexGrow: 1,
   },
