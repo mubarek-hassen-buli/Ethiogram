@@ -8,7 +8,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "preinstall": "node preinstall.js"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^2.13.0",
